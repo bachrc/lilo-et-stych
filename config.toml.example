@@ -1,0 +1,27 @@
+# Example configuration file for lilo-et-stych
+# Copy this file to config.toml and fill in your credentials
+
+[matrix.homeserver]
+# URL of your Matrix homeserver
+url = "https://matrix.example.com"
+
+[matrix.bot]
+# Matrix ID of your bot (format: @username:server.com)
+username = "@yourbot:example.com"
+
+# Password for your bot account
+password = "your_secure_password"
+
+[stych]
+# Email for Stych.fr login
+email = "your-email@example.com"
+
+# Password for Stych.fr login
+mdp = "your_stych_password"
+
+# Optional: target user for notifications (defaults to @pacha:cyberendroit.net)
+# target_user = "@your-user:example.com"
+
+[monitoring]
+# Interval between checks for new courses (in seconds)
+check_interval_seconds = 60
