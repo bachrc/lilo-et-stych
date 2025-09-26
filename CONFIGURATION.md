@@ -8,7 +8,7 @@ Le bot supporte trois méthodes de configuration (par ordre de priorité) :
 2. **Variables d'environnement**
 3. **Fichier de configuration** (priorité la plus basse)
 
-Pour plus de détails sur l'utilisation de ces méthodes, consultez le guide complet : [CONFIG_USAGE.md](CONFIG_USAGE.md)
+Cela signifie que les arguments de ligne de commande remplaceront les variables d'environnement, qui remplaceront les valeurs du fichier de configuration.
 
 ## Configuration via Fichier
 
@@ -52,6 +52,11 @@ cargo run -- \
   --target-user "@target:example.com"
 ```
 
+Utiliser un fichier de configuration différent :
+```bash
+cargo run -- --config /path/to/custom-config.toml
+```
+
 ## Configuration via Variables d'Environnement
 
 Définissez les variables d'environnement :
@@ -65,10 +70,39 @@ export STYCH_PASSWORD="env-stych-password"
 export TARGET_USER="@env-target:example.com"
 ```
 
-Puis lancez le bot :
-```bash
-cargo run
+## Exemple de Configuration Mixte (Démonstration de la Priorité)
+
+Fichier de configuration (`config.toml`) :
+```toml
+[matrix.homeserver]
+url = "https://file-server.com"
+
+[matrix.bot]
+username = "@file-bot:server.com"
+password = "file-password"
+
+[stych]
+email = "file@example.com"
+mdp = "file-stych-password"
 ```
+
+Variables d'environnement :
+```bash
+export MATRIX_HOMESERVER_URL="https://env-server.com"
+export STYCH_EMAIL="env@example.com"
+```
+
+Arguments de ligne de commande :
+```bash
+cargo run -- --matrix-homeserver-url "https://cli-server.com"
+```
+
+**Résultat**: Le bot utilisera :
+- Serveur Matrix : `https://cli-server.com` (CLI remplace les variables d'environnement)
+- Nom d'utilisateur du bot : `@file-bot:server.com` (du fichier de configuration)
+- Email Stych : `env@example.com` (variable d'environnement remplace le fichier de configuration)
+- Mot de passe du bot : `file-password` (du fichier de configuration)
+- Mot de passe Stych : `file-stych-password` (du fichier de configuration)
 
 ## Options de Configuration Disponibles
 
@@ -82,15 +116,6 @@ cargo run
 | Utilisateur cible        | `target_user`           | `--target-user`           | `TARGET_USER`            |
 | Chemin du fichier config | N/A                     | `--config`                | N/A                      |
 
-## Utilisation de Base
-
-1. Configurez votre fichier `config.toml` avec les informations de connexion
-2. Lancez le bot : `cargo run`
-3. Le bot enverra un message "bonjour" à l'utilisateur configuré et récupérera les informations de cours de conduite
-
-## Exemples d'Utilisation Avancés
-
-Pour voir tous les exemples d'utilisation et la priorité des configurations, consultez le guide complet : [CONFIG_USAGE.md](CONFIG_USAGE.md)
 
 ## Aide et Informations
 
@@ -108,4 +133,15 @@ cargo run -- --version
 
 - **Ne commettez jamais de mots de passe** dans le contrôle de version
 - Utilisez des variables d'environnement ou des arguments de ligne de commande pour les données sensibles en production
+- Considérez l'utilisation d'un système de gestion des secrets pour les déploiements en production
 - Les mots de passe sont masqués dans les journaux et la sortie
+
+## Dépannage
+
+Si vous rencontrez des erreurs de configuration :
+
+1. Vérifiez que votre syntaxe TOML est correcte
+2. Assurez-vous que tous les champs requis sont présents dans votre fichier de configuration
+3. Vérifiez que les variables d'environnement sont correctement exportées
+4. Utilisez `--help` pour voir toutes les options disponibles
+5. Vérifiez que les identifiants Matrix sont au bon format (`@nom:serveur.com`)
