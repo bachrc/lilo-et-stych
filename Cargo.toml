@@ -1,0 +1,60 @@
+[package]
+name = "lilo-et-stych"
+version = "0.3.0"
+edition = "2021"
+authors = ["bachrc"]
+description = "A Rust library and bot for interacting with Stych.fr driving school platform and Matrix chat"
+license = "MIT"
+repository = "https://github.com/bachrc/lilo-et-stych"
+keywords = ["stych", "driving-school", "matrix", "bot", "api"]
+categories = ["api-bindings", "web-programming"]
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.0", features = ["full"] }
+
+reqwest = { version = "0.12", default-features = false, features = [
+    "rustls-tls",
+    "gzip",
+    "json",
+    "deflate",
+    "brotli",
+] } # HTTP client
+
+# Matrix SDK
+matrix-sdk = { version = "0.14", default-features = false, features = [
+    "e2e-encryption",
+    "experimental-search",
+    "matrix-sdk-search",
+    "rustls-tls",
+    "sqlite",
+] }
+
+# Configuration management
+config = "0.15"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Date/time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Logging
+log = "0.4"
+env_logger = "0.10"
+
+# Utilities
+once_cell = "1.19"
+thiserror = "2.0"
+
+# Command-line argument parsing
+clap = { version = "4.0", features = ["derive", "env"] }
+
+[dev-dependencies]
+tokio-test = "0.4"
+mockito = "1.2"
+
+[[bin]]
+name = "lilo-et-stych"
+path = "src/bin/main.rs"

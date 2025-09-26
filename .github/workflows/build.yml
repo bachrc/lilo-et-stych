@@ -1,0 +1,39 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+        override: true
+
+    - name: Build
+      run: cargo build --release --verbose
+
+    - name: Install cargo-deb
+      run: cargo install cargo-deb
+
+    - name: Build .deb package
+      run: cargo deb
+
+    - name: Upload binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: lilo-et-stych-binary
+        path: target/release/lilo-et-stych
