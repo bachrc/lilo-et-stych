@@ -47,7 +47,7 @@ jobs:
         path: target/release/lilo-et-stych
 
   build-arm64:
-    runs-on: [self-hosted, linux, ARM64]
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -59,16 +59,22 @@ jobs:
       with:
         toolchain: stable
         override: true
+        target: aarch64-unknown-linux-gnu
 
-    - name: Build project
+    - name: Install cross-compilation tools
       run: |
-        cargo build --release
+        sudo apt-get update
+        sudo apt-get install -y gcc-aarch64-linux-gnu
+
+    - name: Build project for ARM64
+      run: |
+        cargo build --release --target aarch64-unknown-linux-gnu
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: binary-arm64
-        path: target/release/lilo-et-stych
+        path: target/aarch64-unknown-linux-gnu/release/lilo-et-stych
 
   release:
     needs: [build-amd64, build-arm64]
