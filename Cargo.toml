@@ -1,6 +1,6 @@
 [package]
 name = "lilo-et-stych"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 authors = ["bachrc"]
 description = "A Rust library and bot for interacting with Stych.fr driving school platform and Matrix chat"
