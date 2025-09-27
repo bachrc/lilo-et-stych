@@ -21,7 +21,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  release-automation:
+  build:
     strategy:
       matrix:
         target: [x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu]
@@ -56,33 +56,6 @@ jobs:
     - name: Install git-cliff
       run: cargo install git-cliff
 
-    - name: Bump version
-      if: matrix.target == 'x86_64-unknown-linux-gnu'
-      run: |
-        cargo set-version --bump ${{ github.event.inputs.version_bump }}
-        VERSION=$(grep '^version =' Cargo.toml | sed -E 's/version = "(.*)"/\1/')
-        echo "NEW_VERSION=v$VERSION" >> $GITHUB_ENV
-
-    - name: Generate changelog
-      if: matrix.target == 'x86_64-unknown-linux-gnu'
-      run: |
-        git cliff --config cliff.toml --tag ${{ env.NEW_VERSION }} > CHANGELOG.md
-
-    - name: Commit and push changes
-      if: matrix.target == 'x86_64-unknown-linux-gnu'
-      run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add Cargo.toml Cargo.lock CHANGELOG.md
-        git commit -m "Release ${{ env.NEW_VERSION }}"
-        git push origin main
-
-    - name: Create and push tag
-      if: matrix.target == 'x86_64-unknown-linux-gnu'
-      run: |
-        git tag ${{ env.NEW_VERSION }}
-        git push origin ${{ env.NEW_VERSION }}
-
     - name: Build project
       run: |
         cargo build --release --target ${{ matrix.target }}
@@ -93,14 +66,43 @@ jobs:
         name: binary-${{ matrix.arch }}
         path: target/${{ matrix.target }}/release/lilo-et-stych
 
-  create-release:
-    needs: release-automation
+  release:
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
         token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Install cargo-edit
+      run: cargo install cargo-edit
+    
+    - name: Install git-cliff
+      run: cargo install git-cliff
+    
+    - name: Bump version
+      run: |
+        cargo set-version --bump ${{ github.event.inputs.version_bump }}
+        VERSION=$(grep '^version =' Cargo.toml | sed -E 's/version = "(.*)"/\1/')
+        echo "NEW_VERSION=v$VERSION" >> $GITHUB_ENV
+    
+    - name: Generate changelog
+      run: |
+        git cliff --config cliff.toml --tag ${{ env.NEW_VERSION }} > CHANGELOG.md
+    
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add Cargo.toml Cargo.lock CHANGELOG.md
+        git commit -m "Release ${{ env.NEW_VERSION }}"
+        git push origin main
+    
+    - name: Create and push tag
+      run: |
+        git tag ${{ env.NEW_VERSION }}
+        git push origin ${{ env.NEW_VERSION }}
     
     - name: Download artifacts
       uses: actions/download-artifact@v4
