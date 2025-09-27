@@ -47,3 +47,18 @@ mockito = "1.2"
 [[bin]]
 name = "lilo-et-stych"
 path = "src/bin/main.rs"
+
+[package.metadata.deb]
+maintainer = "Contributors to lilo-et-stych"
+copyright = "2025, Contributors to lilo-et-stych"
+license-file = ["LICENSE", "0"]
+extended-description = """\
+A Rust library and bot for interacting with Stych.fr driving school platform and Matrix chat."""
+depends = "libc6, libgcc1, libssl1.1"
+section = "net"
+priority = "optional"
+assets = [
+    ["target/release/lilo-et-stych", "usr/bin/", "755"],
+    ["README.md", "usr/share/doc/lilo-et-stych/README", "644"],
+    ["LICENSE", "usr/share/doc/lilo-et-stych/LICENSE", "644"],
+]
