@@ -2,3 +2,4 @@
 config.toml
 !config.toml.example
 .kilocode
+.DS_Store

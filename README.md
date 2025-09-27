@@ -17,7 +17,7 @@ A Rust library and Matrix bot for interacting with the Stych.fr driving school p
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/baptistemillou/lilo-et-stych.git
+   git clone https://github.com/bachrc/lilo-et-stych.git
    cd lilo-et-stych
    ```
 
@@ -82,76 +82,6 @@ cargo run -- \
   --stych-email "your-stych-email@example.com" \
   --target-user "@target-user:server.com"
 ```
-
-See [CONFIG_USAGE.md](CONFIG_USAGE.md) for detailed configuration instructions.
-
-## Library Usage
-
-Add to your `Cargo.toml`:
-
-```toml
-[dependencies]
-lilo-et-stych = { path = "../lilo-et-stych" }  # or version from crates.io when published
-```
-
-Use in your code:
-
-```rust
-use lilo_et_stych::{StychClient, AppConfig, AppResult};
-
-#[tokio::main]
-async fn main() -> AppResult<()> {
-    // Load configuration
-    let config = AppConfig::load()?;
-    
-    // Create Stych client
-    let client = StychClient::new(config.stych);
-    
-    // Get nearest course
-    let nearest_course = client.get_nearest_course().await?;
-    
-    if let Some(course) = nearest_course {
-        println!("Nearest course: {}", course.description());
-    }
-    
-    Ok(())
-}
-```
-
-## Development
-
-### Prerequisites
-
-- Rust 1.60 or later
-- Cargo
-
-### Building
-
-```bash
-cargo build
-```
-
-### Testing
-
-```bash
-cargo test
-```
-
-### Running
-
-```bash
-cargo run
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ## License
 
