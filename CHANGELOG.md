@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2025-09-27
+
+### Bug Fixes
+
+- Resolve ARM64 repository access issue in cross-compilation
+- Improve APT configuration for ARM64 cross-compilation
+- Improve ARM64 cross-compilation handling in CI
+
+### Build
+
+- Switch reqwest to rustls-tls and disable default features
+- Update dependencies including reqwest, matrix-sdk, config and thiserror
+
+### Ci
+
+- Implement cross-compilation and remove legacy release workflow
+- Rename workflow to create new release
+- Automate artifact upload and release creation
+- Rename job and restructure release automation
+- Remove unused cargo-edit and git-cliff installations
+- Add cross-compilation support for aarch64 target
+- Fix cross-compilation dependencies for ARM64 architecture
+- Split build jobs for amd64 and arm64 architectures
+- Switch to ubuntu-latest runner and fix arm64 cross-compilation
+- Remove arm64 build job and update release dependencies
+
 ## [0.3.0] - 2025-09-27
 
 ### Miscellaneous Tasks
