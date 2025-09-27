@@ -22,6 +22,14 @@ permissions:
 
 jobs:
   release-automation:
+    strategy:
+      matrix:
+        target: [x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu]
+        include:
+          - target: x86_64-unknown-linux-gnu
+            arch: amd64
+          - target: aarch64-unknown-linux-gnu
+            arch: arm64
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -33,7 +41,14 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
+        target: ${{ matrix.target }}
         override: true
+
+    - name: Install cross-compilation tools
+      if: matrix.target == 'aarch64-unknown-linux-gnu'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-aarch64-linux-gnu
 
     - name: Install cargo-edit
       run: cargo install cargo-edit
@@ -42,16 +57,19 @@ jobs:
       run: cargo install git-cliff
 
     - name: Bump version
+      if: matrix.target == 'x86_64-unknown-linux-gnu'
       run: |
         cargo set-version --bump ${{ github.event.inputs.version_bump }}
         VERSION=$(grep '^version =' Cargo.toml | sed -E 's/version = "(.*)"/\1/')
         echo "NEW_VERSION=v$VERSION" >> $GITHUB_ENV
 
     - name: Generate changelog
+      if: matrix.target == 'x86_64-unknown-linux-gnu'
       run: |
         git cliff --config cliff.toml --tag ${{ env.NEW_VERSION }} > CHANGELOG.md
 
     - name: Commit and push changes
+      if: matrix.target == 'x86_64-unknown-linux-gnu'
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
@@ -60,11 +78,23 @@ jobs:
         git push origin main
 
     - name: Create and push tag
+      if: matrix.target == 'x86_64-unknown-linux-gnu'
       run: |
         git tag ${{ env.NEW_VERSION }}
         git push origin ${{ env.NEW_VERSION }}
 
+    - name: Build project
+      run: |
+        cargo build --release --target ${{ matrix.target }}
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: binary-${{ matrix.arch }}
+        path: target/${{ matrix.target }}/release/lilo-et-stych
+
     - name: Create GitHub Release
+      if: matrix.target == 'x86_64-unknown-linux-gnu'
       uses: softprops/action-gh-release@v1
       with:
         name: Release ${{ env.NEW_VERSION }}
@@ -72,5 +102,8 @@ jobs:
         body_path: CHANGELOG.md
         draft: false
         prerelease: false
+        files: |
+          target/x86_64-unknown-linux-gnu/release/lilo-et-stych
+          target/aarch64-unknown-linux-gnu/release/lilo-et-stych
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
