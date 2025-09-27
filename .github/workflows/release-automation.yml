@@ -22,15 +22,7 @@ permissions:
   packages: write
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        target: [x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu]
-        include:
-          - target: x86_64-unknown-linux-gnu
-            arch: amd64
-          - target: aarch64-unknown-linux-gnu
-            arch: arm64
+  build-amd64:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -42,50 +34,44 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
-        target: ${{ matrix.target }}
         override: true
-
-    - name: Install cross-compilation tools
-      if: matrix.target == 'aarch64-unknown-linux-gnu'
-      run: |
-        # Filter out problematic ARM64 entries from sources.list
-        sudo sed -i '/\[arch=arm64\]/d' /etc/apt/sources.list
-        sudo sed -i '/arm64/d' /etc/apt/sources.list
-        
-        # Configure APT to handle multiple architectures properly
-        echo 'APT::Architectures { "amd64"; "arm64"; };' | sudo tee /etc/apt/apt.conf.d/99architecture
-        echo 'Acquire::Languages { "none"; };' | sudo tee /etc/apt/apt.conf.d/99no-languages
-        echo 'APT::Get::AllowUnauthenticated "true";' | sudo tee -a /etc/apt/apt.conf.d/99architecture
-        echo 'Acquire::AllowInsecureRepositories "true";' | sudo tee -a /etc/apt/apt.conf.d/99architecture
-        
-        # Add ARM64 architecture
-        sudo dpkg --add-architecture arm64
-        
-        # Update package lists, ignoring errors for missing ARM64 repos
-        sudo apt-get update || true
-        
-        # Install cross-compilation tools with force options to bypass repository issues
-        sudo apt-get install -y --force-yes gcc-aarch64-linux-gnu libssl-dev:arm64 || \
-          sudo apt-get install -y gcc-aarch64-linux-gnu libssl-dev:arm64
-
-    - name: Set up cross-compilation environment
-      if: matrix.target == 'aarch64-unknown-linux-gnu'
-      run: |
-        echo "PKG_CONFIG_ALLOW_CROSS=1" >> $GITHUB_ENV
-        echo "PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig" >> $GITHUB_ENV
 
     - name: Build project
       run: |
-        cargo build --release --target ${{ matrix.target }}
+        cargo build --release
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: binary-${{ matrix.arch }}
-        path: target/${{ matrix.target }}/release/lilo-et-stych
+        name: binary-amd64
+        path: target/release/lilo-et-stych
+
+  build-arm64:
+    runs-on: [self-hosted, linux, ARM64]
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+
+    - name: Build project
+      run: |
+        cargo build --release
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: binary-arm64
+        path: target/release/lilo-et-stych
 
   release:
-    needs: build
+    needs: [build-amd64, build-arm64]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
