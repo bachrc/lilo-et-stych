@@ -8,6 +8,9 @@ on:
 env:
   CARGO_TERM_COLOR: always
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -29,10 +32,17 @@ jobs:
     - name: Build .deb package
       run: cargo deb
 
+    - name: Check files exist
+      run: |
+        ls -l target/release/lilo-et-stych
+        ls -l target/debian/*.deb
+
     - name: Create GitHub Release
       id: create_release
       uses: softprops/action-gh-release@v1
       with:
+        name: Release ${{ github.ref_name }}
+        tag_name: ${{ github.ref_name }}
         files: |
           target/release/lilo-et-stych
           target/debian/*.deb
