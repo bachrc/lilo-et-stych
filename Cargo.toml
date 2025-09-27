@@ -2,10 +2,10 @@
 name = "lilo-et-stych"
 version = "0.2.0"
 edition = "2021"
-authors = ["Contributors to lilo-et-stych"]
+authors = ["bachrc"]
 description = "A Rust library and bot for interacting with Stych.fr driving school platform and Matrix chat"
 license = "MIT"
-repository = "https://github.com/baptistemillou/lilo-et-stych"
+repository = "https://github.com/bachrc/lilo-et-stych"
 keywords = ["stych", "driving-school", "matrix", "bot", "api"]
 categories = ["api-bindings", "web-programming"]
 
@@ -58,7 +58,19 @@ depends = "libc6, libgcc1, libssl1.1"
 section = "net"
 priority = "optional"
 assets = [
-    ["target/*/release/lilo-et-stych", "usr/bin/", "755"],
-    ["README.md", "usr/share/doc/lilo-et-stych/README", "644"],
-    ["LICENSE", "usr/share/doc/lilo-et-stych/LICENSE", "644"],
+    [
+        "target/*/release/lilo-et-stych",
+        "usr/bin/",
+        "755",
+    ],
+    [
+        "README.md",
+        "usr/share/doc/lilo-et-stych/README",
+        "644",
+    ],
+    [
+        "LICENSE",
+        "usr/share/doc/lilo-et-stych/LICENSE",
+        "644",
+    ],
 ]

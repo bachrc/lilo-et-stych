@@ -39,8 +39,7 @@ jobs:
       run: cargo install cargo-edit
 
     - name: Install git-cliff
-      run: |
-        wget -O - https://raw.githubusercontent.com/orhun/git-cliff/main/install.sh | sudo sh
+      run: cargo install git-cliff
 
     - name: Bump version
       run: |
