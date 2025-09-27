@@ -46,38 +46,8 @@ jobs:
         name: binary-amd64
         path: target/release/lilo-et-stych
 
-  build-arm64:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
-        target: aarch64-unknown-linux-gnu
-
-    - name: Install cross-compilation tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc-aarch64-linux-gnu
-
-    - name: Build project for ARM64
-      run: |
-        cargo build --release --target aarch64-unknown-linux-gnu
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: binary-arm64
-        path: target/aarch64-unknown-linux-gnu/release/lilo-et-stych
-
   release:
-    needs: [build-amd64, build-arm64]
+    needs: [build-amd64]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
