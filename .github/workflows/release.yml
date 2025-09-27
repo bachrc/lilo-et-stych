@@ -13,6 +13,9 @@ permissions:
 
 jobs:
   release:
+    strategy:
+      matrix:
+        target: [x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -21,21 +24,29 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
+        target: ${{ matrix.target }}
         override: true
 
     - name: Build binary
-      run: cargo build --release --verbose
+      run: cargo build --target ${{ matrix.target }} --release --verbose
 
     - name: Install cargo-deb
       run: cargo install cargo-deb
 
     - name: Build .deb package
-      run: cargo deb
+      run: cargo deb --target ${{ matrix.target }}
+    
+    - name: Rename artifacts with target architecture
+      run: |
+        mkdir -p target/artifacts
+        cp target/${{ matrix.target }}/release/lilo-et-stych target/artifacts/lilo-et-stych-${{ matrix.target }}
+        if [ -f "target/${{ matrix.target }}/debian/"*.deb ]; then
+          cp target/${{ matrix.target }}/debian/*.deb target/artifacts/
+        fi
 
     - name: Check files exist
       run: |
-        ls -l target/release/lilo-et-stych
-        ls -l target/debian/*.deb
+        ls -l target/artifacts/
 
     - name: Create GitHub Release
       id: create_release
@@ -44,7 +55,6 @@ jobs:
         name: Release ${{ github.ref_name }}
         tag_name: ${{ github.ref_name }}
         files: |
-          target/release/lilo-et-stych
-          target/debian/*.deb
+          target/artifacts/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
