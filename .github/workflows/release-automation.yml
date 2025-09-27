@@ -50,12 +50,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y gcc-aarch64-linux-gnu
 
-    - name: Install cargo-edit
-      run: cargo install cargo-edit
-
-    - name: Install git-cliff
-      run: cargo install git-cliff
-
     - name: Build project
       run: |
         cargo build --release --target ${{ matrix.target }}
