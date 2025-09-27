@@ -102,6 +102,5 @@ jobs:
         prerelease: false
         files: |
           artifacts/binary-amd64/lilo-et-stych
-          artifacts/binary-arm64/lilo-et-stych
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
