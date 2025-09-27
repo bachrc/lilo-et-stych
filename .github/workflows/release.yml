@@ -36,11 +36,20 @@ jobs:
     - name: Build .deb package
       run: cargo deb --target ${{ matrix.target }}
     
+    - name: Check if .deb package was created
+      id: check_deb
+      run: |
+        if ls target/${{ matrix.target }}/debian/*.deb 1> /dev/null 2>&1; then
+          echo "deb_exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "deb_exists=false" >> $GITHUB_OUTPUT
+        fi
+    
     - name: Rename artifacts with target architecture
       run: |
         mkdir -p target/artifacts
         cp target/${{ matrix.target }}/release/lilo-et-stych target/artifacts/lilo-et-stych-${{ matrix.target }}
-        if [ -f "target/${{ matrix.target }}/debian/"*.deb ]; then
+        if [[ "${{ steps.check_deb.outputs.deb_exists }}" == "true" ]]; then
           cp target/${{ matrix.target }}/debian/*.deb target/artifacts/
         fi
 

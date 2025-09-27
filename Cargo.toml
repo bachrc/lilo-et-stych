@@ -58,7 +58,7 @@ depends = "libc6, libgcc1, libssl1.1"
 section = "net"
 priority = "optional"
 assets = [
-    ["target/release/lilo-et-stych", "usr/bin/", "755"],
+    ["target/*/release/lilo-et-stych", "usr/bin/", "755"],
     ["README.md", "usr/share/doc/lilo-et-stych/README", "644"],
     ["LICENSE", "usr/share/doc/lilo-et-stych/LICENSE", "644"],
 ]
